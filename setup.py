@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup (
     name='mongowatch',
-    version='0.1.0dev',
+    version='0.1.1dev',
     author = "Russ Ferriday",
     author_email = "russf@topia.com",
     description = "MongoDB traffic pattern watcher",
