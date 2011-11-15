@@ -25,7 +25,8 @@ class Watcher(object):
     def reset(self):
         for db in self.dbs:
             self.conn[db].set_profiling_level(pymongo.ALL)
-            latest = self.conn[db].system.profile.find_one(sort=[(u'ts', pymongo.DESCENDING)])
+            latest = self.conn[db].system.profile.find_one(\
+                                 sort=[(u'ts', pymongo.DESCENDING)])
         self.start = latest and latest[u'ts'] or None
         self.running = True
 
@@ -45,7 +46,8 @@ class Watcher(object):
             def isSystem(a):
                 return a[u'ns'].endswith(u'system.profile')
 
-            raw[db] = [a for a in actions if not isProfile(a) and not isSystem(a)]
+            raw[db] = [a for a in actions if not \
+                       isProfile(a) and not isSystem(a)]
 
         self.raw = raw
     

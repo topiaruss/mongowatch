@@ -22,7 +22,7 @@ from mongowatch.mongo import watcher
 def doctest_MongoWatch_simple():
     r"""MongoWatch: simple
 
-    MongoWatch provides an easy way to overview mongo database traffic::
+    MongoWatch provides an easy way to overview mongo database accesses::
 
     First access the database and ensure a collection is created
 
@@ -34,7 +34,8 @@ def doctest_MongoWatch_simple():
 
      >>> crowd = db.people
 
-    Now create a watcher to watch for fresh traffic to the selected database
+    Now create a watcher to watch for fresh profile entries to the 
+    selected database
 
      >>> wa = watcher.Watcher(conn,[DBNAME])
 
