@@ -12,7 +12,7 @@ setup (
     license = "ZPL 2.1",
     keywords = "mongo testing",
     classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',

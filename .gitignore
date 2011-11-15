@@ -1,6 +1,7 @@
+dist/
 bin/
 coverage/
 develop-eggs/
-src/mongowatch-egg-info/
+src/mongowatch.egg-info/
 *.pyc
 .installed.cfg
