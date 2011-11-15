@@ -36,8 +36,13 @@ class Watcher(object):
 
         raw = {}
         for db in self.dbs:
-            actions = self.conn[db].system.profile.find()
-            raw[db] = list(actions)
+            actions = list(self.conn[db].system.profile.find())
+
+            def isProfile(a):
+                return u'command' in a and a[u'command'] == {u'profile': 0}
+
+            raw[db] = [a for a in actions if not isProfile(a)]
+
         self.raw = raw
     
         stats = {}
@@ -51,26 +56,23 @@ class Watcher(object):
     def print_ops(self):              
         print 'ops...'
         for db in self.dbs:
-            for s in self.summary[db].items():
-                print s
+            for k,v in self.summary[db].items():
+                print '  %ss: %d' % (k,v)
     
     def print_summary(self):
         print 'summary...'
         for db in self.dbs:
-            print 'database...', db
+            print '  database...', db
             collections = {}
-            for actions in self.raw[db]:
-                for a in actions:
-                    if u'command' in a and a[u'command'] == {u'profile': 0}:
-                        continue    
-                    collection = a[u'ns'].split('.')[1]
-                    collection = collections.setdefault(collection, {})
-                    op = a[u'op']
-                    collection[op] = collection.setdefault(op, 0) + 1
+            for a in self.raw[db]:
+                collection = a[u'ns'].split('.')[1]
+                collection = collections.setdefault(collection, {})
+                op = a[u'op']
+                collection[op] = collection.setdefault(op, 0) + 1
             for c, ops in collections.items():
-                print c
-                print ops
-
+                print '    ', c
+                for k,v in ops.items():
+                    print '       %ss: %d' % (k,v)
 
     def print_details(self):
         print 'details...'
@@ -78,12 +80,14 @@ class Watcher(object):
             for s in self.raw[db]:
                 if u'command' in s and s[u'command'] == {u'profile': 0}:
                     continue    
-                print s
+                for k in (u'client',u'user'):
+                    s.pop(k)
+                print ' ', s
         
     def dump(self):
         if self.running:
             self.stop()
-        self.ops()
+        self.print_ops()
         self.print_summary()
         self.print_details()
 
