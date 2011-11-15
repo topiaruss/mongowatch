@@ -85,7 +85,7 @@ class Watcher(object):
         print 'details:'
         for db in self.dbs:
             for s in self.raw[db]:
-                for k in (u'client',u'user'):
+                for k in (u'client', u'user'):
                     s.pop(k)
                 print ' ', s
         
