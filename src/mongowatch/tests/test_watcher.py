@@ -16,13 +16,44 @@ import doctest
 import pprint
 from pymongo import dbref, objectid
 
-from mongowatch import testing, mongo
+from mongowatch import testing
+from mongowatch.mongo import watcher
 
 def doctest_MongoWatch_simple():
     r"""MongoWatch: simple
 
     MongoWatch provides an easy way to overview mongo database traffic::
-    w = mongowatch.Watcher()
+
+    First access the database and ensure a collection is created
+
+     >>> db = conn[DBNAME]
+
+     >>> traffic = db.cars
+     >>> traffic.insert({'car': 'red'})
+     ObjectId('...')
+
+     >>> crowd = db.people
+
+    Now create a watcher to watch for fresh traffic to the selected database
+
+     >>> wa = watcher.Watcher(conn,[DBNAME])
+
+    Add an item to traffic:
+
+     >>> traffic.insert({'truck':'blue'})
+     ObjectId('...')
+
+    Add two people to the crowd:
+
+     >>> crowd.insert({'name':'billy'})
+     ObjectId('...')
+     >>> crowd.insert({'name':'jane'})
+     ObjectId('...')
+
+    Which resulted in the following actions being recorded in the watcher
+
+     >>> wa.dump()
+     inserts: 1
 
     """
 

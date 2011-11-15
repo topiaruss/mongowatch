@@ -19,8 +19,8 @@ import re
 from zope.testing import module, renormalizing
 
 checker = renormalizing.RENormalizing([
-    (re.compile(r'datetime.datetime(.*)'),
-     'datetime.datetime(2011, 10, 1, 9, 45)'),
+#    (re.compile(r'datetime.datetime(.*)'),
+#     'datetime.datetime(2011, 10, 1, 9, 45)'),
     (re.compile(r"ObjectId\('[0-9a-f]*'\)"),
      "ObjectId('4e7ddf12e138237403000000')"),
     (re.compile(r"object at 0x[0-9a-f]*>"),
@@ -41,5 +41,6 @@ def setUp(test):
 
 def tearDown(test):
     module.tearDown(test)
-    test.globs['conn'].drop_database(test.globs['DBNAME'])
+    #test.globs['conn'].drop_database(test.globs['DBNAME'])
+    print 're-enable db drop'
     test.globs['conn'].disconnect()
