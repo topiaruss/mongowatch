@@ -41,5 +41,6 @@ def setUp(test):
 
 def tearDown(test):
     module.tearDown(test)
-    test.globs['conn'].drop_database(test.globs['DBNAME'])
+    for db in ['streetlife', 'culture', test.globs['DBNAME']]:
+        test.globs['conn'].drop_database(db)
     test.globs['conn'].disconnect()

@@ -53,18 +53,53 @@ def doctest_MongoWatch_simple():
     Which resulted in the following actions being recorded in the watcher
 
      >>> wa.dump()
-     ops...
+     total ops:
        inserts: 3
-     summary...
-       database... mongowatch_test
+     summary:
+       database: mongowatch_test
           cars
             inserts: 1
           people
             inserts: 2
-     details...
+     details:
        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 626000), u'ns': u'mongowatch_test.cars', u'op': u'insert'}
        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
+
+    """
+
+def doctest_MongoWatch_multiple_databases():
+    r"""MongoWatch: multiple databases
+
+     >>> db = conn['streetlife']
+     >>> traffic = db.cars
+     >>> ob = traffic.insert({'car': 'red'})
+     >>> crowd = db.people
+     
+     >>> db = conn['culture']
+     >>> artists = db.artists
+
+     >>> wa = watcher.Watcher(conn,['streetlife', 'culture'])
+
+     >>> ob = traffic.insert({'truck':'blue'})
+     >>> ob = artists.insert({'impressionist':'Monet'})
+
+    Which resulted in the following actions being recorded in the watcher
+
+     >>> wa.dump()
+      total ops:
+        inserts: 2
+      summary:
+        database: streetlife
+           cars
+             inserts: 1
+        database: culture
+           artists
+             inserts: 1
+      details:
+        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 12, 49, 52, 456000), u'ns': u'streetlife.cars', u'op': u'insert'}
+        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 12, 49, 52, 457000), u'ns': u'culture.artists', u'op': u'insert'}
+
     """
 
 

@@ -25,7 +25,8 @@ class Watcher(object):
     def reset(self):
         for db in self.dbs:
             self.conn[db].set_profiling_level(pymongo.ALL)
-        self.start = self.conn[db].system.profile.find()
+            latest = self.conn[db].system.profile.find_one(sort=[(u'ts', pymongo.DESCENDING)])
+        self.start = latest and latest[u'ts'] or None
         self.running = True
 
     def stop(self):
@@ -36,12 +37,15 @@ class Watcher(object):
 
         raw = {}
         for db in self.dbs:
-            actions = list(self.conn[db].system.profile.find())
+            actions = [ a for a in self.conn[db].system.profile.find() if \
+                          self.start is None or a[u'ts'] > self.start]
 
             def isProfile(a):
                 return u'command' in a and a[u'command'] == {u'profile': 0}
+            def isSystem(a):
+                return a[u'ns'].endswith(u'system.profile')
 
-            raw[db] = [a for a in actions if not isProfile(a)]
+            raw[db] = [a for a in actions if not isProfile(a) and not isSystem(a)]
 
         self.raw = raw
     
@@ -54,15 +58,18 @@ class Watcher(object):
         self.summary = stats
 
     def print_ops(self):              
-        print 'ops...'
+        print 'total ops:'
+        ops = {}
         for db in self.dbs:
             for k,v in self.summary[db].items():
-                print '  %ss: %d' % (k,v)
+                ops[k] = ops.setdefault(k, 0) + v
+        for k,v in ops.items():
+            print '  %ss: %d' % (k,v)
     
     def print_summary(self):
-        print 'summary...'
+        print 'summary:'
         for db in self.dbs:
-            print '  database...', db
+            print '  database:', db
             collections = {}
             for a in self.raw[db]:
                 collection = a[u'ns'].split('.')[1]
@@ -75,11 +82,9 @@ class Watcher(object):
                     print '       %ss: %d' % (k,v)
 
     def print_details(self):
-        print 'details...'
+        print 'details:'
         for db in self.dbs:
             for s in self.raw[db]:
-                if u'command' in s and s[u'command'] == {u'profile': 0}:
-                    continue    
                 for k in (u'client',u'user'):
                     s.pop(k)
                 print ' ', s
@@ -90,13 +95,3 @@ class Watcher(object):
         self.print_ops()
         self.print_summary()
         self.print_details()
-
-
-"""        [{u'millis': 0, 
-            u'ts': datetime.datetime(2011, 11, 15, 9, 44, 6, 939000), 
-            u'client': u'127.0.0.1', 
-            u'user': u'', 
-            u'ns': u'mongowatch_test.mycollection', 
-            u'op': u'insert'}]
-
-"""
