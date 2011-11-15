@@ -27,7 +27,7 @@ setup (
             'zope.app.testing',
             'zope.testing',
             ),
-        zope = (
+        mongo = (
             ),
         ),
     install_requires = [

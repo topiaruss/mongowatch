@@ -13,17 +13,16 @@
 ##############################################################################
 """Mongo Watcher Tests"""
 import doctest
-import persistent
 import pprint
 from pymongo import dbref, objectid
 
-from mongowatch import testing, mapping
+from mongowatch import testing, mongo
 
 def doctest_MongoWatch_simple():
     r"""MongoWatch: simple
 
     MongoWatch provides an easy way to overview mongo database traffic::
-
+    w = mongowatch.Watcher()
 
     """
 

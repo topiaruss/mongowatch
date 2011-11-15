@@ -16,7 +16,6 @@ from __future__ import absolute_import
 import doctest
 import pymongo
 import re
-import transaction
 from zope.testing import module, renormalizing
 
 checker = renormalizing.RENormalizing([
@@ -42,7 +41,5 @@ def setUp(test):
 
 def tearDown(test):
     module.tearDown(test)
-    transaction.abort()
     test.globs['conn'].drop_database(test.globs['DBNAME'])
     test.globs['conn'].disconnect()
-    serialize.SERIALIZERS.__init__()
