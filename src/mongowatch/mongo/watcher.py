@@ -48,16 +48,34 @@ class Watcher(object):
                 stats[db][a['op']] = stats[db].setdefault(a['op'], 0) + 1
         self.summary = stats
 
-    def print_summary(self):              
-        print 'summary...'
+    def print_ops(self):              
+        print 'ops...'
         for db in self.dbs:
             for s in self.summary[db].items():
                 print s
-        
+    
+    def print_summary(self):
+        print 'summary...'
+        for db in self.dbs:
+            print 'database...', db
+            collections = {}
+            for actions in self.raw[db]:
+                for a in actions:
+                    if u'command' in a and a[u'command'] == {u'profile': 0}:
+                        continue    
+                    collection = a[u'ns'].split('.')[1]
+                    collection = collections.setdefault(collection, {})
+                    op = a[u'op']
+                    collection[op] = collection.setdefault(op, 0) + 1
+            for c, ops in collections.items():
+                print c
+                print ops
+
+
     def print_details(self):
         print 'details...'
         for db in self.dbs:
-            for s in list(self.raw[db]):
+            for s in self.raw[db]:
                 if u'command' in s and s[u'command'] == {u'profile': 0}:
                     continue    
                 print s
@@ -65,6 +83,7 @@ class Watcher(object):
     def dump(self):
         if self.running:
             self.stop()
+        self.ops()
         self.print_summary()
         self.print_details()
 
