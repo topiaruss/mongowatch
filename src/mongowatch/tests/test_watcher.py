@@ -103,6 +103,47 @@ def doctest_MongoWatch_multiple_databases():
 
     """
 
+def doctest_MongoWatch_reset():
+    r"""MongoWatch: reset
+
+     >>> db = conn['streetlife']
+     >>> traffic = db.cars
+     >>> ob = traffic.insert({'car': 'red'})
+     
+     >>> wa = watcher.Watcher(conn,['streetlife', 'culture'])
+
+     >>> ob = traffic.insert({'truck':'blue'})
+
+    Which resulted in the following actions being recorded in the watcher
+
+     >>> wa.dump()
+      total ops:
+        inserts: 1
+      summary:
+        database: streetlife
+           cars
+             inserts: 1
+        database: culture
+      details:
+        {u'millis': 0, u'ts': datetime.datetime(2011, 10, 1, 9, 45)
+
+     >>> wa.reset()
+     >>> ob = traffic.insert({'truck':'green'})
+     >>> ob = traffic.insert({'truck':'white'})
+     >>> wa.dump()
+      total ops:
+        inserts: 2
+      summary:
+        database: streetlife
+           cars
+             inserts: 2
+        database: culture
+      details:
+        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 14, 40, 7, 909000), u'ns': u'streetlife.cars', u'op': u'insert'}
+        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 14, 40, 7, 909000), u'ns': u'streetlife.cars', u'op': u'insert'}
+
+    """
+
 
 def test_suite():
     return doctest.DocTestSuite(
