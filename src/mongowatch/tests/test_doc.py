@@ -16,6 +16,7 @@ import doctest
 
 from mongowatch import testing
 
+
 def test_suite():
     return doctest.DocFileSuite(
         '../README.txt',

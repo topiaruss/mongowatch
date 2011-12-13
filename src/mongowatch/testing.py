@@ -25,6 +25,9 @@ checker = renormalizing.RENormalizing([
      "ObjectId('4e7ddf12e138237403000000')"),
     (re.compile(r"object at 0x[0-9a-f]*>"),
      "object at 0x001122>"),
+    (re.compile(r"20\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) "\
+                 "\d\d:\d\d\:\d\d.[0-9]*"),
+     "2011-12-13 07:47:51.921000"),
     ])
 
 OPTIONFLAGS = (doctest.NORMALIZE_WHITESPACE|
@@ -33,11 +36,13 @@ OPTIONFLAGS = (doctest.NORMALIZE_WHITESPACE|
                #|doctest.REPORT_NDIFF
                )
 
+
 def setUp(test):
     module.setUp(test)
     test.globs['conn'] = pymongo.Connection('localhost', 27017, tz_aware=False)
     test.globs['DBNAME'] = 'mongowatch_test'
     test.globs['conn'].drop_database(test.globs['DBNAME'])
+
 
 def tearDown(test):
     module.tearDown(test)

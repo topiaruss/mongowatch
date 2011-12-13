@@ -15,6 +15,7 @@
 
 import pymongo
 
+
 class Watcher(object):
 
     def __init__(self, conn, dbs):
@@ -38,11 +39,12 @@ class Watcher(object):
 
         raw = {}
         for db in self.dbs:
-            actions = [ a for a in self.conn[db].system.profile.find() if \
+            actions = [a for a in self.conn[db].system.profile.find() if \
                           self.start is None or a[u'ts'] > self.start]
 
             def isProfile(a):
                 return u'command' in a and a[u'command'] == {u'profile': 0}
+
             def isSystem(a):
                 return a[u'ns'].endswith(u'system.profile')
 
@@ -50,7 +52,7 @@ class Watcher(object):
                        isProfile(a) and not isSystem(a)]
 
         self.raw = raw
-    
+
         stats = {}
         for db in self.dbs:
             actions = self.raw[db]
@@ -59,15 +61,15 @@ class Watcher(object):
                 stats[db][a['op']] = stats[db].setdefault(a['op'], 0) + 1
         self.summary = stats
 
-    def print_ops(self):              
+    def print_ops(self):
         print 'total ops:'
         ops = {}
         for db in self.dbs:
-            for k,v in self.summary[db].items():
+            for k, v in self.summary[db].items():
                 ops[k] = ops.setdefault(k, 0) + v
-        for k,v in ops.items():
-            print '  %ss: %d' % (k,v)
-    
+        for k, v in ops.items():
+            print '  %ss: %d' % (k, v)
+
     def print_summary(self):
         print 'summary:'
         for db in self.dbs:
@@ -80,17 +82,22 @@ class Watcher(object):
                 collection[op] = collection.setdefault(op, 0) + 1
             for c, ops in collections.items():
                 print '    ', c
-                for k,v in ops.items():
-                    print '       %ss: %d' % (k,v)
+                for k, v in ops.items():
+                    print '       %ss: %d' % (k, v)
 
     def print_details(self):
         print 'details:'
         for db in self.dbs:
             for s in self.raw[db]:
-                for k in (u'client', u'user'):
-                    s.pop(k)
-                print ' ', s
-        
+                #for k in (u'client', u'user'):
+                #    s.pop(k)
+                #print ' ', s
+                for k in (u'ns', u'op', u'query', u'ts', u'millis'):
+                    v = s.pop(k, None)
+                    if v is not None:
+                        print ' ', k, v
+                print
+
     def dump(self):
         if self.running:
             self.stop()

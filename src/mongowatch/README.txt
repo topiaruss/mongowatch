@@ -2,26 +2,27 @@
 Mongo Watch
 ===========
 
-MongoWatch provides an easy way to overview mongo database accesses::
+MongoWatch provides an easy way to measure mongo database access
+counts, and timeing, between certain points in a program.
 
-First let's access the database and ensure a collection is created
+First let's access the database and get a db object
 
  >>> import pymongo
  >>> conn = pymongo.Connection('localhost', 27017, tz_aware=False)
- >>> db = conn['mongowatch_test']
+ >>> db = conn[DBNAME]
 
-We'll start with collections related to street life, traffic and crowds
+Our example collections relate to street life, traffic, and crowds
 
  >>> traffic = db.cars
  >>> crowd = db.people
 
-We'll create a vehicle to represent something pre-existing in the 
+Let's create a vehicle to represent something already in a 
 collection
 
  >>> obj = traffic.insert({'car': 'red'})
 
-Now create a watcher to watch for fresh profile entries created
-by any future actions on the selected database
+Now create a watcher track mongo profile entries created
+by actions on the selected database
 
  >>> from mongowatch.mongo import watcher
  >>> wa = watcher.Watcher(conn,[DBNAME])
@@ -35,7 +36,7 @@ And we'll add two people to the crowd:
  >>> obj = crowd.insert({'name':'billy'})
  >>> obj = crowd.insert({'name':'jane'})
 
-Which resulted in the following actions being recorded in the watcher
+Which resulted in the following actions being recorded in the watcher.
 
  >>> wa.dump()
  total ops:
@@ -47,9 +48,64 @@ Which resulted in the following actions being recorded in the watcher
       people
         inserts: 2
  details:
-   {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 626000), u'ns': u'mongowatch_test.cars', u'op': u'insert'}
-   {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
-   {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
+   ns mongowatch_test.cars
+   op insert
+   ts 2011-12-13 08:27:05.496000
+   millis ...
+ <BLANKLINE>
+   ns mongowatch_test.people
+   op insert
+   ts 2011-12-13 08:27:05.498000
+   millis ...
+ <BLANKLINE>
+   ns mongowatch_test.people
+   op insert
+   ts 2011-12-13 08:27:05.498000
+   millis ...
+ <BLANKLINE>
+
+Let's reset the counters
+
+ >>> wa.reset()
+
+So now do some more work
+
+ >>> crowd.remove({})
+ >>> traffic.remove({})
+ >>> obj = crowd.insert({'name':'bonzo'})
+
+This time we stop the watcher explicity
+ >>> wa.stop()
+ >>> wa.dump()
+ total ops:
+   inserts: 1
+   removes: 2
+ summary:
+   database: mongowatch_test
+      cars
+        removes: 1
+      people
+        inserts: 1
+        removes: 1
+ details:
+   ns mongowatch_test.people
+   op remove
+   query {}
+   ts 2011-12-13 07:47:51.921000
+   millis 0
+ <BLANKLINE>
+   ns mongowatch_test.cars
+   op remove
+   query {}
+   ts 2011-12-13 07:47:51.921000
+   millis 0
+ <BLANKLINE>
+   ns mongowatch_test.people
+   op insert
+   ts 2011-12-13 07:47:51.921000
+   millis 0
+ <BLANKLINE>
+
 
  >>> conn.disconnect()
 

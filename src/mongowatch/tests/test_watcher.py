@@ -13,9 +13,6 @@
 ##############################################################################
 """Mongo Watcher Tests"""
 import doctest
-import pprint
-from pymongo import dbref, objectid
-
 from mongowatch import testing
 from mongowatch.mongo import watcher
 
@@ -34,7 +31,7 @@ def doctest_MongoWatch_simple():
 
      >>> crowd = db.people
 
-    Now create a watcher to watch for fresh profile entries to the 
+    Now create a watcher to watch for fresh profile entries to the
     selected database
 
      >>> wa = watcher.Watcher(conn,[DBNAME])
@@ -63,9 +60,21 @@ def doctest_MongoWatch_simple():
           people
             inserts: 2
      details:
-       {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 626000), u'ns': u'mongowatch_test.cars', u'op': u'insert'}
-       {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
-       {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 11, 48, 36, 627000), u'ns': u'mongowatch_test.people', u'op': u'insert'}
+       ns mongowatch_test.cars
+       op insert
+       ts 2011-12-13 08:30:54.850000
+       millis ...
+     <BLANKLINE>
+       ns mongowatch_test.people
+       op insert
+       ts 2011-12-13 08:30:54.851000
+       millis ...
+     <BLANKLINE>
+       ns mongowatch_test.people
+       op insert
+       ts 2011-12-13 08:30:54.851000
+       millis ...
+     <BLANKLINE>
 
     """
 
@@ -76,7 +85,7 @@ def doctest_MongoWatch_multiple_databases():
      >>> traffic = db.cars
      >>> ob = traffic.insert({'car': 'red'})
      >>> crowd = db.people
-     
+
      >>> db = conn['culture']
      >>> artists = db.artists
 
@@ -88,18 +97,26 @@ def doctest_MongoWatch_multiple_databases():
     Which resulted in the following actions being recorded in the watcher
 
      >>> wa.dump()
-      total ops:
-        inserts: 2
-      summary:
-        database: streetlife
-           cars
-             inserts: 1
-        database: culture
-           artists
-             inserts: 1
-      details:
-        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 12, 49, 52, 456000), u'ns': u'streetlife.cars', u'op': u'insert'}
-        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 12, 49, 52, 457000), u'ns': u'culture.artists', u'op': u'insert'}
+     total ops:
+       inserts: 2
+     summary:
+       database: streetlife
+          cars
+            inserts: 1
+       database: culture
+          artists
+            inserts: 1
+     details:
+       ns streetlife.cars
+       op insert
+       ts 2011-12-13 08:32:23.360000
+       millis ...
+     <BLANKLINE>
+       ns culture.artists
+       op insert
+       ts 2011-12-13 08:32:23.361000
+       millis ...
+     <BLANKLINE>
 
     """
 
@@ -117,30 +134,42 @@ def doctest_MongoWatch_reset():
     Which resulted in the following actions being recorded in the watcher
 
      >>> wa.dump()
-      total ops:
-        inserts: 1
-      summary:
-        database: streetlife
-           cars
-             inserts: 1
-        database: culture
-      details:
-        {u'millis': 0, u'ts': datetime.datetime(2011, 10, 1, 9, 45)
+     total ops:
+       inserts: 1
+     summary:
+       database: streetlife
+          cars
+            inserts: 1
+       database: culture
+     details:
+       ns streetlife.cars
+       op insert
+       ts 2011-12-13 07:47:51.921000
+       millis ...
+     <BLANKLINE>
 
      >>> wa.reset()
      >>> ob = traffic.insert({'truck':'green'})
      >>> ob = traffic.insert({'truck':'white'})
      >>> wa.dump()
-      total ops:
-        inserts: 2
-      summary:
-        database: streetlife
-           cars
-             inserts: 2
-        database: culture
-      details:
-        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 14, 40, 7, 909000), u'ns': u'streetlife.cars', u'op': u'insert'}
-        {u'millis': 0, u'ts': datetime.datetime(2011, 11, 15, 14, 40, 7, 909000), u'ns': u'streetlife.cars', u'op': u'insert'}
+     total ops:
+       inserts: 2
+     summary:
+       database: streetlife
+          cars
+            inserts: 2
+       database: culture
+     details:
+       ns streetlife.cars
+       op insert
+       ts 2011-12-13 07:47:51.921000
+       millis ...
+     <BLANKLINE>
+       ns streetlife.cars
+       op insert
+       ts 2011-12-13 07:47:51.921000
+       millis ...
+     <BLANKLINE>
 
     """
 

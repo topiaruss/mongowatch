@@ -3,12 +3,17 @@
 import os
 from setuptools import setup, find_packages
 
+def read(*rnames):
+    text = open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    return unicode(text, 'utf-8').encode('ascii', 'xmlcharrefreplace')
+
 setup (
     name='mongowatch',
-    version='0.1.1dev',
+    version='0.1.2dev',
     author = "Russ Ferriday",
     author_email = "russf@topia.com",
     description = "MongoDB traffic pattern watcher",
+    long_description=read('src', 'mongowatch', 'README.txt'),
     license = "ZPL 2.1",
     keywords = "mongo testing",
     classifiers = [
